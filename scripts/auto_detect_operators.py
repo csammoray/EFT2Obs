@@ -173,7 +173,7 @@ def findRelevantParameters2(process, possible_params):
   to_remove = []
   for param in params:
     if param not in possible_params:
-      if param+"Re" in possible_params:
+      if param+"re" in possible_params:
         complex_params.append(param)
       else:
         to_remove.append(param)
@@ -183,9 +183,9 @@ def findRelevantParameters2(process, possible_params):
 
   for param in complex_params:
     params.remove(param)
-    params.append(param+"Re")
-    if param+"Im" in possible_params: #if SMEFTcpv is not a required block, Im component not needed
-      params.append(param+"Im")
+    params.append(param+"re")
+    if param+"im" in possible_params: #if SMEFTcpv is not a required block, Im component not needed
+      params.append(param+"im")
 
   return params
 

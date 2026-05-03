@@ -40,7 +40,7 @@ namespace Rivet {
     // DEFAULT_RIVET_ANALYSIS_CTOR(CMS_2025_I2872501);
     RIVET_DEFAULT_ANALYSIS_CTOR(CMS_2025_I2872501);
     void init() {
-      sumW_ = 0.;
+      // sumW_ = 0.;
       _nEventsTotal = 0;
       _nEventsFinal = 0;
       //---All final state particles
@@ -65,18 +65,33 @@ namespace Rivet {
       FinalState fs_muons(Cuts::abspid == PID::MUON);
       declare(fs_muons, "FS_MUONS");
 
-      book(_histo, "hist", 1, 0, 100000);
-      book(_h_ZZ_pth, "pt_h", {0,10,20,30,45,60,80,120,200,10000});
-      book(_h_ZZ_pth_incl, "pt_h_incl", 1, 0, 10000);
-      book(_h_ZZ_mz2, "m_z2", {12,20,24,28,32,40,55,65,120});
-      // TODO: Define these two
-      // book(_h_ZZ_deta, "deta_jj", {0.0,1.6,3.0,1000});
-      // book(_h_ZZ_deltaphijj, "deltaphijj", {-M_PI, -M_PI/2, 0, M_PI/2, M_PI});
+      //---Jets
+      FastJets fs_jets(fs, FastJets::ANTIKT, 0.4);
+      declare(fs_jets, "JETS");
+
+      book(_h_sigma, "h_sigma", 1, 0, 2); // Histogram to get the cross-section without fiducial cuts
+      book(_h_ZZ_incl, "incl", 1, 0, 10000);
+      book(_h_ZZ_pth, "pt_h", {0,10,16,22,28,36,46,60,80,106,146,10000});
+      book(_h_ZZ_mz2, "m_z2", {12,22,26,28,32,34,40,50,65});
+      book(_h_ZZ_mz2_incl, "m_z2_incl", 1, 0, 65);
+      book(_h_ZZ_deltaphijj, "deltaphijj", {-100, -M_PI, -M_PI/2, 0, M_PI/2, M_PI});
+      book(_h_ZZ_deta, "deta_jj", {-100,0,1.1,2.9,4.4,10});
+      
+      // book(_histo, "hist", 1, 0, 100000); 
+      // book(_h_ZZ_pth, "pt_h", {0,10,20,30,45,60,80,120,200,10000}); // old version
+      // book(_h_ZZ_mz2, "m_z2", {12,20,24,26,30,32,35,40,50,55,65}); // old version
+      // book(_h_ZZ_mz2_CMS, "m_z2_CMS", {0,12,20,25,28,32,40,50,65});
+      // book(_h_ZZ_mz2_ATLAS, "m_z2_ATLAS", {0,12,20,24,28,32,40,55,65});
+      // book(_h_ZZ_mz2_ATLAS_12_65_GeV, "m_z2_ATLAS_12_65_GeV", {12,20,24,28,32,40,55,65});
     }
 
     void analyze(const Event& event) {
-      sumW_ += event.weights()[0];
-      _histo->fill(sumW_);
+      // sumW_ += event.weights()[0];
+      // _histo->fill(sumW_);
+
+      _h_sigma->fill(1.0);
+
+      auto jets = apply<JetAlg>(event, "JETS").jetsByPt(Cuts::abseta < 4.7 && Cuts::pT > 30*GeV);
 
       ++_nEventsTotal;
 
@@ -177,36 +192,89 @@ namespace Rivet {
       if (!zmass_result.passFidSel) vetoEvent;
 
       FourMomentum ZZsystem;
-      FourMomentum Z2cand;
       for (int idx : zmass_result.z_leps_idx) {
         ZZsystem += dressed_leptons[idx].momentum();
-  if (idx > 1) {
-    std::cout << idx << std::endl;
-          Z2cand += dressed_leptons[idx].momentum();    
-        }
       }
 
+      FourMomentum Z2cand;
+      int idx3 = zmass_result.z_leps_idx[2];
+      int idx4 = zmass_result.z_leps_idx[3];
+      Z2cand += dressed_leptons[idx3].momentum();
+      Z2cand += dressed_leptons[idx4].momentum();
+      
       double m4l = ZZsystem.mass();
       double pT4l = ZZsystem.pT();
       double mz2 = Z2cand.mass();
 
+      if (mz2 < MIN_MZ2) vetoEvent;
       if (m4l < 105.0 || m4l > 160.0) vetoEvent;
 
       ++_nEventsFinal;
+      _h_ZZ_incl->fill(pT4l / GeV);
       _h_ZZ_pth->fill(pT4l / GeV);
-      _h_ZZ_pth_incl->fill(pT4l / GeV);
       _h_ZZ_mz2->fill(mz2 / GeV);
+      _h_ZZ_mz2_incl->fill(mz2 / GeV);
+
+      // _h_ZZ_mz2_CMS->fill(mz2 / GeV);
+      // _h_ZZ_mz2_ATLAS->fill(mz2 / GeV);
+      // _h_ZZ_mz2_ATLAS_12_65_GeV->fill(mz2 / GeV);
+
+      if(jets.size() > 1) {
+        _h_ZZ_deltaphijj->fill(deltaphi_jj(jets[0].momentum(), jets[1].momentum()));
+        _h_ZZ_deta->fill(fabs(deltaEta(jets[0], jets[1])));
+      }
+      else {
+        _h_ZZ_deltaphijj->fill((-4.0)); // Underflow bin for events with 0 or 1 jet
+        _h_ZZ_deta->fill((-0.5)); // Underflow bin for events with 0 or 1 jet
+      }
     }
 
     void finalize(){
       MSG_INFO("Events: " << _nEventsTotal);
       MSG_INFO("Selected: " << _nEventsFinal);
+      // scale(_histo, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_sigma, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_incl, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_pth, crossSection() / femtobarn * BR / sumOfWeights());
-      scale(_h_ZZ_pth_incl, crossSection() / femtobarn * BR / sumOfWeights());
-      scale(_h_ZZ_mz2, crossSection() / femtobarn * BR /sumOfWeights());
+      scale(_h_ZZ_mz2, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_mz2_incl, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_deltaphijj, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_deta, crossSection() / femtobarn * BR / sumOfWeights());
+      // scale(_h_ZZ_mz2_CMS, crossSection() / femtobarn * BR / sumOfWeights());
+      // scale(_h_ZZ_mz2_ATLAS, crossSection() / femtobarn * BR / sumOfWeights());
+      // scale(_h_ZZ_mz2_ATLAS_12_65_GeV, crossSection() / femtobarn * BR / sumOfWeights());
     }
 
   private:
+
+    double deltaPhiCustom(double phi1, double phi2) {
+      const double x = mapAngleMPiToPi(phi1 - phi2);
+      return x;
+    }
+
+    double deltaphi_jj(const FourMomentum& h1, const FourMomentum& h2) {
+      //Direction of the two jets - vectors in the lab frame
+      Vector3 j1dir(h1.x(), h1.y(), h1.z());
+      Vector3 j2dir(h2.x(), h2.y(), h2.z());
+      //Transverse component in the xy plane
+      Vector3 jt1(h1.x(), h1.y(), 0);
+      Vector3 jt2(h2.x(), h2.y(), 0);
+      //Unit vectors of the transverse components
+      Vector3 jt1_norm   = jt1 * (1/jt1.mod());
+      Vector3 jt2_norm   = jt2 * (1/jt2.mod());
+      //Unit vector of the z axis
+      Vector3 z(0,0,1);
+      //Cross product between transverse components
+      double cross      = jt1_norm.cross(jt2_norm).dot(z);
+      double cross_norm = cross * (1 / abs(cross));
+      //Dot product between transverse components
+      double dot         = jt1_norm.dot(jt2_norm);
+      //Difference between the direction of the two jets
+      double diff       = (j1dir - j2dir).dot(z);
+      double diff_norm  = diff * (1 / abs(diff));
+      return acos(dot) * diff_norm * cross_norm;
+    }
+
     ZMassResult buildZMasses(const std::vector<Particle>& leptons,
                              const std::vector<double>& iso,
                              bool makeCuts);
@@ -229,13 +297,20 @@ namespace Rivet {
     std::tuple<bool, bool, bool> checkEventTopology(const std::vector<Particle>& leptons,
                                                     const std::vector<int>& z_leps_idx);
 
-    double sumW_;
+    // double sumW_;
     size_t _nEventsTotal;
     size_t _nEventsFinal;
-    Histo1DPtr _histo;
+    // Histo1DPtr _histo;
+    Histo1DPtr _h_sigma;
+    Histo1DPtr _h_ZZ_incl;
     Histo1DPtr _h_ZZ_pth;
-    Histo1DPtr _h_ZZ_pth_incl;
     Histo1DPtr _h_ZZ_mz2;
+    Histo1DPtr _h_ZZ_mz2_incl;
+    Histo1DPtr _h_ZZ_deltaphijj;
+    Histo1DPtr _h_ZZ_deta;
+    // Histo1DPtr _h_ZZ_mz2_CMS;
+    // Histo1DPtr _h_ZZ_mz2_ATLAS;
+    // Histo1DPtr _h_ZZ_mz2_ATLAS_12_65_GeV;
     // H > 4l BR
     const double BR = 0.000128;
     // TODO: Define histos as
@@ -349,9 +424,6 @@ namespace Rivet {
             idx_l4 = j;
             findZ2 = true;
             maxPtSum = ptSum;
-          } else if (!findZ2) {
-            idx_l3 = i;
-            idx_l4 = j;
           }
         }
       }
