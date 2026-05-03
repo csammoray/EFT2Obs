@@ -1,0 +1,409 @@
+change rwgt_dir rwgt
+change process p p > h NP=2 QED=1 QCD=0
+change process p p > h j NP=2 QED=1 QCD=1 --add
+change process p p > h j j NP=2 QED=1 QCD=2 --add
+launch --rwgt_name=rw0000
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0001
+set DIM6 2 0.005
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0002
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0003
+set DIM6 2 0
+set DIM6 4 0.005
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0004
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0005
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.005
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0006
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0007
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.005
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0008
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0009
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.005
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0010
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0011
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.005
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0012
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0013
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.005
+set DIM64F4L 7 0
+launch --rwgt_name=rw0014
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0015
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.005
+launch --rwgt_name=rw0016
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0017
+set DIM6 2 0.01
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0018
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0019
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0020
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0021
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0022
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0023
+set DIM6 2 0.01
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0024
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0025
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0026
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0027
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0028
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0029
+set DIM6 2 0
+set DIM6 4 0.01
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0030
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0031
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0032
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0033
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0034
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0.01
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0035
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0036
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0037
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0038
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0.01
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0039
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0
+launch --rwgt_name=rw0040
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0041
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0.01
+set DIM62F 19 0
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0042
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0.01
+set DIM64F4L 7 0
+launch --rwgt_name=rw0043
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0.01
+set DIM62F 24 0
+set DIM64F4L 7 0.01
+launch --rwgt_name=rw0044
+set DIM6 2 0
+set DIM6 4 0
+set DIM6 8 0
+set DIM62F 4 0
+set DIM62F 5 0
+set DIM62F 19 0
+set DIM62F 24 0.01
+set DIM64F4L 7 0.01

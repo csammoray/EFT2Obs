@@ -1,0 +1,14 @@
+import model SMEFTatNLO-ggH
+
+define pl = g u c d s u~ c~ d~ s~
+
+generate p p > h QED=1 NP=0 QCD=2 [noborn=QCD]
+add process p p > h j QED=1 NP=0 QCD=3 [noborn=QCD]
+add process pl pl > h j j QED=1 NP=0 QCD=4 [noborn=QCD]
+
+# NP introduced in reweight cards
+# change process p p > h NP=2 QCD=0 QED=1 QCD^2==2 NP^2==4 [virt=QCD]
+# change process p p > h j NP=2 QCD=1 QED=1 QCD^2==4 NP^2==4 [virt=QCD] --add
+# change process p p > h j j NP=2 QCD=2 QED=1 QCD^2==6 NP^2==4 [virt=QCD] --add
+
+output ggH_SMEFTatNLO_HZZ_tree_loop_4 -nojpeg
