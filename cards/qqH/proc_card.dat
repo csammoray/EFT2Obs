@@ -1,5 +1,0 @@
-import model HEL_UFO
-
-generate p p > h j j / j vl vl~ l+ l- h a QCD=0 NP<=1 @0
-
-output qqH
