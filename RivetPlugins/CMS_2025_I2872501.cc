@@ -4,11 +4,13 @@
 #include "Rivet/Projections/FinalState.hh"
 #include "Rivet/Projections/VisibleFinalState.hh"
 #include "Rivet/Tools/RivetYODA.hh"
+#include <fstream>
+#include <iostream>
 
 constexpr double ZMASS = 91.1876;
 constexpr double MIN_MZ1 = 40.0;
 constexpr double MAX_MZ1 = 120.0;
-constexpr double MIN_MZ2 = 12.0;
+constexpr double MIN_MZ2 = 0.0; // 12.0
 constexpr double MAX_MZ2 = 120.0;
 
 struct ZMassResult {
@@ -72,11 +74,15 @@ namespace Rivet {
       book(_h_sigma, "h_sigma", 1, 0, 2); // Histogram to get the cross-section without fiducial cuts
       book(_h_ZZ_incl, "incl", 1, 0, 10000);
       book(_h_ZZ_pth, "pt_h", {0,10,16,22,28,36,46,60,80,106,146,10000});
+      book(_h_ZZ_mz1, "m_z1", {40,65,75,85,92,120});
       book(_h_ZZ_mz2, "m_z2", {12,22,26,28,32,34,40,50,65});
-      book(_h_ZZ_mz2_incl, "m_z2_incl", 1, 0, 65);
+      book(_h_ZZ_mz2_accTest, "m_z2_accTest", {0,12,22,26,28,32,34,40,50,65});
       book(_h_ZZ_dphi_jj, "dphi_jj", {-100, -M_PI, -M_PI/2, 0, M_PI/2, M_PI});
       book(_h_ZZ_deta_jj, "deta_jj", {-100,0,1.1,2.9,4.4,10});
       book(_h_ZZ_phi, "phi", {-M_PI, -3*M_PI/4, -M_PI/2, -M_PI/4, 0, M_PI/4, M_PI/2, 3*M_PI/4, M_PI});
+      book(_h_ZZ_phi_2e2mu, "phi_2e2mu", {-M_PI, -3*M_PI/4, -M_PI/2, -M_PI/4, 0, M_PI/4, M_PI/2, 3*M_PI/4, M_PI});
+      book(_h_ZZ_phi_4e, "phi_4e", {-M_PI, -3*M_PI/4, -M_PI/2, -M_PI/4, 0, M_PI/4, M_PI/2, 3*M_PI/4, M_PI});
+      book(_h_ZZ_phi_4mu, "phi_4mu", {-M_PI, -3*M_PI/4, -M_PI/2, -M_PI/4, 0, M_PI/4, M_PI/2, 3*M_PI/4, M_PI});
       book(_h_ZZ_y4l_pT4l, "yh_pt_h", 12, 0, 12);
       book(_h_ZZ_mz1_mz2, "mz1_mz2", 7, 0, 7);
     }
@@ -107,8 +113,7 @@ namespace Rivet {
         if(parents.empty()) continue;
 
         int mom_id = getTrueMotherPID(lep,0);
-        if (!(mom_id == 25 || mom_id == 23 || mom_id == 443 || mom_id == 553 || abs(mom_id) == 24)) continue;        
-
+        if (!(mom_id == 25 || mom_id == 23 || mom_id == 443 || mom_id == 553 || abs(mom_id) == 24)) continue;
         FourMomentum lep_dressed = lep.momentum();
 
         int _fsr_idx = -1;
@@ -203,7 +208,7 @@ namespace Rivet {
       
       double m4l = ZZsystem.mass();
       double pT4l = ZZsystem.pT();
-      double y4l = fabs(ZZsystem.rapidity());
+      double y4l = std::fabs(ZZsystem.rapidity());
       double mz1 = Z1cand.mass();
       double mz2 = Z2cand.mass();
 
@@ -213,13 +218,54 @@ namespace Rivet {
       ++_nEventsFinal;
       _h_ZZ_incl->fill(pT4l / GeV);
       _h_ZZ_pth->fill(pT4l / GeV);
+      _h_ZZ_mz1->fill(mz1 / GeV);
       _h_ZZ_mz2->fill(mz2 / GeV);
-      _h_ZZ_mz2_incl->fill(mz2 / GeV);
-      _h_ZZ_phi->fill(computePhi(dressed_leptons, zmass_result.z_leps_idx));
+      _h_ZZ_mz2_accTest->fill(mz2 / GeV);
+
+      // FourMomentum p4M11 = dressed_leptons[zmass_result.z_leps_idx[0]].momentum();
+      // FourMomentum p4M12 = dressed_leptons[zmass_result.z_leps_idx[1]].momentum();
+      // FourMomentum p4M21 = dressed_leptons[zmass_result.z_leps_idx[2]].momentum();
+      // FourMomentum p4M22 = dressed_leptons[zmass_result.z_leps_idx[3]].momentum();
+      // int Z1_lept1Id = dressed_leptons[zmass_result.z_leps_idx[0]].pid();
+      // int Z1_lept2Id = dressed_leptons[zmass_result.z_leps_idx[1]].pid();
+      // int Z2_lept1Id = dressed_leptons[zmass_result.z_leps_idx[2]].pid();
+      // int Z2_lept2Id = dressed_leptons[zmass_result.z_leps_idx[3]].pid();
+      double phi = computePhi(dressed_leptons, zmass_result.z_leps_idx);
+
+      // {
+      //   std::ofstream melaDump("CMS_2025_I2872501_mela_inputs.txt", std::ios::app);
+      //   if (melaDump.is_open()) {
+      //     melaDump
+      //     << "MELA inputs:"
+      //     << " p4M11=(" << p4M11.E() << ", " << p4M11.px() << ", " << p4M11.py() << ", " << p4M11.pz() << ")"
+      //     << " Z1_lept1Id=" << Z1_lept1Id
+      //     << " p4M12=(" << p4M12.E() << ", " << p4M12.px() << ", " << p4M12.py() << ", " << p4M12.pz() << ")"
+      //     << " Z1_lept2Id=" << Z1_lept2Id
+      //     << " p4M21=(" << p4M21.E() << ", " << p4M21.px() << ", " << p4M21.py() << ", " << p4M21.pz() << ")"
+      //     << " Z2_lept1Id=" << Z2_lept1Id
+      //     << " p4M22=(" << p4M22.E() << ", " << p4M22.px() << ", " << p4M22.py() << ", " << p4M22.pz() << ")"
+      //     << " Z2_lept2Id=" << Z2_lept2Id
+      //     << " phi=" << phi
+      //     << std::endl;
+      //   }
+      // }
+      _h_ZZ_phi->fill(phi);
+      int nEle = 0;
+      int nMu = 0;
+      for (int idx : zmass_result.z_leps_idx) {
+        int id = dressed_leptons[idx].abspid();
+        if (id == PID::ELECTRON) ++nEle;
+        if (id == PID::MUON) ++nMu;
+      }
+      if (nEle == 2 && nMu == 2) {
+        _h_ZZ_phi_2e2mu->fill(phi);
+      }
+      if (nEle == 4) _h_ZZ_phi_4e->fill(phi);
+      if (nMu == 4) _h_ZZ_phi_4mu->fill(phi);
 
       if(jets.size() > 1) {
         _h_ZZ_dphi_jj->fill(deltaphi_jj(jets[0].momentum(), jets[1].momentum()));
-        _h_ZZ_deta_jj->fill(fabs(deltaEta(jets[0], jets[1])));
+        _h_ZZ_deta_jj->fill(std::fabs(deltaEta(jets[0], jets[1])));
       }
       else {
         _h_ZZ_dphi_jj->fill((-4.0)); // Underflow bin for events with 0 or 1 jet
@@ -228,35 +274,35 @@ namespace Rivet {
 
       // Fill 2D histogram y4l vs pT4l
       if (pT4l < 50.0) {
-        if      (y4l < 0.2) _h_ZZ_y4l_pT4l->fill(0.5);
-        else if (y4l < 0.4) _h_ZZ_y4l_pT4l->fill(1.5);
-        else if (y4l < 0.65) _h_ZZ_y4l_pT4l->fill(2.5);
-        else if (y4l < 0.9) _h_ZZ_y4l_pT4l->fill(3.5);
-        else if (y4l < 1.2) _h_ZZ_y4l_pT4l->fill(4.5);
-        else if (y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(5.5);
+        if      (y4l >= 0.0 && y4l < 0.2) _h_ZZ_y4l_pT4l->fill(0.5);
+        else if (y4l >= 0.2 && y4l < 0.4) _h_ZZ_y4l_pT4l->fill(1.5);
+        else if (y4l >= 0.4 && y4l < 0.65) _h_ZZ_y4l_pT4l->fill(2.5);
+        else if (y4l >= 0.65 && y4l < 0.9) _h_ZZ_y4l_pT4l->fill(3.5);
+        else if (y4l >= 0.9 && y4l < 1.2) _h_ZZ_y4l_pT4l->fill(4.5);
+        else if (y4l >= 1.2 && y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(5.5);
       }
-      else if (pT4l < 105.0) {
-        if      (y4l < 0.5) _h_ZZ_y4l_pT4l->fill(6.5);
-        else if (y4l < 1.15) _h_ZZ_y4l_pT4l->fill(7.5);
-        else if (y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(8.5);
+      else if (pT4l >= 50.0 && pT4l < 105.0) {
+        if      (y4l >= 0.0 && y4l < 0.5) _h_ZZ_y4l_pT4l->fill(6.5);
+        else if (y4l >= 0.5 && y4l < 1.15) _h_ZZ_y4l_pT4l->fill(7.5);
+        else if (y4l >= 1.15 && y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(8.5);
       }
-      else if (pT4l < 10000.0) {
-        if      (y4l < 0.45) _h_ZZ_y4l_pT4l->fill(9.5);
-        else if (y4l < 1.0) _h_ZZ_y4l_pT4l->fill(10.5);
-        else if (y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(11.5);
+      else if (pT4l >= 105 && pT4l < 10000.0) {
+        if      (y4l >= 0.0 && y4l < 0.45) _h_ZZ_y4l_pT4l->fill(9.5);
+        else if (y4l >= 0.45 && y4l < 1.0) _h_ZZ_y4l_pT4l->fill(10.5);
+        else if (y4l >= 1.0 && y4l <= 2.5) _h_ZZ_y4l_pT4l->fill(11.5);
       }
 
       // Fill 2D histogram mz1 vs mz2
       if (mz1 >= 40.0 && mz1 < 88.0) {
-          if (mz2 >= 12.0 && mz2 < 28.0) _h_ZZ_mz1_mz2->fill(0.5);
-          else if (mz2 < 34.0) _h_ZZ_mz1_mz2->fill(1.5);
-          else if (mz2 < 40.0) _h_ZZ_mz1_mz2->fill(2.5);
-          else if (mz2 < 65.0) _h_ZZ_mz1_mz2->fill(3.5);
+          if      (mz2 >= 12.0 && mz2 < 28.0) _h_ZZ_mz1_mz2->fill(0.5);
+          else if (mz2 >= 28.0 && mz2 < 34.0) _h_ZZ_mz1_mz2->fill(1.5);
+          else if (mz2 >= 34.0 && mz2 < 40.0) _h_ZZ_mz1_mz2->fill(2.5);
+          else if (mz2 >= 40.0 && mz2 < 65.0) _h_ZZ_mz1_mz2->fill(3.5);
       }
       else if (mz1 >= 88.0 && mz1 < 120.0) {
-          if (mz2 >= 12.0 && mz2 < 25.0) _h_ZZ_mz1_mz2->fill(4.5);
-          else if (mz2 < 28.0) _h_ZZ_mz1_mz2->fill(5.5);
-          else if (mz2 < 65.0) _h_ZZ_mz1_mz2->fill(6.5);
+          if      (mz2 >= 12.0 && mz2 < 25.0) _h_ZZ_mz1_mz2->fill(4.5);
+          else if (mz2 >= 25.0 && mz2 < 28.0) _h_ZZ_mz1_mz2->fill(5.5);
+          else if (mz2 >= 28.0 && mz2 < 65.0) _h_ZZ_mz1_mz2->fill(6.5);
       
       }
     }    
@@ -267,11 +313,15 @@ namespace Rivet {
       scale(_h_sigma, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_incl, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_pth, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_mz1, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_mz2, crossSection() / femtobarn * BR / sumOfWeights());
-      scale(_h_ZZ_mz2_incl, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_mz2_accTest, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_dphi_jj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_deta_jj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_phi, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_phi_2e2mu, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_phi_4e, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_ZZ_phi_4mu, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_y4l_pT4l, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_ZZ_mz1_mz2, crossSection() / femtobarn * BR / sumOfWeights());
     }
@@ -290,8 +340,8 @@ namespace Rivet {
       const double p1sq = p1old.mass2();
       const double p2sq = p2old.mass2();
       const double p1p2 = p1old.dot(p2old);
-      const double m1sq = m1 * fabs(m1);
-      const double m2sq = m2 * fabs(m2);
+      const double m1sq = m1 * std::fabs(m1);
+      const double m2sq = m2 * std::fabs(m2);
       const double p12sq = p12.mass2();
 
       FourMomentum avec = p2old;
@@ -307,7 +357,7 @@ namespace Rivet {
       const double b = (p12sq + m2sq - m1sq) * (p1p2*p1p2 - p1sq*p2sq);
       const double c = 0.25 * std::pow(p12sq + m2sq - m1sq, 2) * p1sq - std::pow(p1sq + p1p2, 2) * m2sq;
 
-      const double eta = (-b - std::sqrt(fabs(b*b - 4.0 * a * c))) / (2.0 * a);
+      const double eta = (-b - std::sqrt(std::fabs(b*b - 4.0 * a * c))) / (2.0 * a);
       const double xi = (p12sq + m2sq - m1sq - 2.0 * eta * (p2sq + p1p2)) / (2.0 * (p1sq + p1p2));
 
       FourMomentum p1hat = p1old;
@@ -329,50 +379,66 @@ namespace Rivet {
     double computePhi(const std::vector<Particle>& leptons, const std::vector<int>& z_leps_idx) {
       if (z_leps_idx.size() != 4) return -999;
 
-      const Particle& a1 = leptons[z_leps_idx[0]];
-      const Particle& a2 = leptons[z_leps_idx[1]];
-      const Particle& b1 = leptons[z_leps_idx[2]];
-      const Particle& b2 = leptons[z_leps_idx[3]];
+      FourMomentum p4M11 = leptons[z_leps_idx[0]].momentum();
+      FourMomentum p4M12 = leptons[z_leps_idx[1]].momentum();
+      int id11 = leptons[z_leps_idx[0]].pid();
+      int id12 = leptons[z_leps_idx[1]].pid();
 
-      // Sorting the leptons
-      FourMomentum Z1_neg_lep = (a1.pid() > 0) ? a1.momentum() : a2.momentum();
-      FourMomentum Z1_pos_lep = (a1.pid() > 0) ? a2.momentum() : a1.momentum();
+      if (
+        (id11*id12 < 0 && id11 < 0) ||
+        ((id11*id12 > 0) && p4M11.phi() <= p4M12.phi())
+      ) {
+        std::swap(p4M11, p4M12);
+      }
 
-      FourMomentum Z2_neg_lep = (b1.pid() > 0) ? b1.momentum() : b2.momentum();
-      FourMomentum Z2_pos_lep = (b1.pid() > 0) ? b2.momentum() : b1.momentum();
+      FourMomentum p4M21 = leptons[z_leps_idx[2]].momentum();
+      FourMomentum p4M22 = leptons[z_leps_idx[3]].momentum();
+      int id21 = leptons[z_leps_idx[2]].pid();
+      int id22 = leptons[z_leps_idx[3]].pid();
 
-      constrainedRemovePairMass(Z1_neg_lep, Z1_pos_lep, 0.0, 0.0);
-      constrainedRemovePairMass(Z2_neg_lep, Z2_pos_lep, 0.0, 0.0);
+      if (
+        (id21*id22 < 0 && id21 < 0) ||
+        ((id21*id22 > 0) && p4M21.phi() <= p4M22.phi())
+      ) {
+        std::swap(p4M21, p4M22);
+      }
 
+      constrainedRemovePairMass(p4M11, p4M12, 0.0, 0.0);
+      constrainedRemovePairMass(p4M21, p4M22, 0.0, 0.0);
 
-      const FourMomentum Z1 = Z1_neg_lep + Z1_pos_lep;
-      const FourMomentum Z2 = Z2_neg_lep + Z2_pos_lep;
+      const FourMomentum Z1 = p4M11 + p4M12;
+      const FourMomentum Z2 = p4M21 + p4M22;
       const FourMomentum H  = Z1 + Z2;
 
       const LorentzTransform boost_H_restframe = LorentzTransform::mkFrameTransformFromBeta(H.betaVec());
 
-      const FourMomentum Z1_neg_lep_boosted = boost_H_restframe.transform(Z1_neg_lep);
-      const FourMomentum Z1_pos_lep_boosted = boost_H_restframe.transform(Z1_pos_lep);
-      const FourMomentum Z2_neg_lep_boosted = boost_H_restframe.transform(Z2_neg_lep);
-      const FourMomentum Z2_pos_lep_boosted = boost_H_restframe.transform(Z2_pos_lep);
+      const FourMomentum p4M11_boosted = boost_H_restframe.transform(p4M11);
+      const FourMomentum p4M12_boosted = boost_H_restframe.transform(p4M12);
+      const FourMomentum p4M21_boosted = boost_H_restframe.transform(p4M21);
+      const FourMomentum p4M22_boosted = boost_H_restframe.transform(p4M22);
 
-      const FourMomentum Z1_boosted = Z1_neg_lep_boosted + Z1_pos_lep_boosted;
+      const FourMomentum Z1_boosted = p4M11_boosted + p4M12_boosted;
 
-      const Vector3 Z1_p3 = Z1_boosted.vector3();
-      const Vector3 n1 = Z1_neg_lep_boosted.vector3().cross(Z1_pos_lep_boosted.vector3());
-      const Vector3 n2 = Z2_neg_lep_boosted.vector3().cross(Z2_pos_lep_boosted.vector3());
+      const Vector3 Z1_p3_boosted = Z1_boosted.vector3();
+      const Vector3 n1_boosted = p4M11_boosted.vector3().cross(p4M12_boosted.vector3());
+      const Vector3 n2_boosted = p4M21_boosted.vector3().cross(p4M22_boosted.vector3());
 
-      if (Z1_p3.mod() == 0.0 || n1.mod() == 0.0 || n2.mod() == 0.0)
+      if (Z1_p3_boosted.mod() == 0.0 || n1_boosted.mod() == 0.0 || n2_boosted.mod() == 0.0)
         return -999;
 
-      const Vector3 Z1_p3_norm = Z1_p3.unit();
-      const Vector3 n1_norm = n1.unit();
-      const Vector3 n2_norm = n2.unit();
+      const Vector3 Z1_p3_boosted_norm = Z1_p3_boosted.unit();
+      const Vector3 n1_boosted_norm = n1_boosted.unit();
+      const Vector3 n2_boosted_norm = n2_boosted.unit();
 
-      const double cosPhi = std::max(-1.0, std::min(1.0, -n1_norm.dot(n2_norm)));
-      const double sinPhi = Z1_p3_norm.dot(n1_norm.cross(n2_norm));
+      const double tmpSgnPhi = Z1_p3_boosted_norm.dot(n1_boosted_norm.cross(n2_boosted_norm));
+      double sgnPhi = 0.0;
+      if (std::fabs(tmpSgnPhi) > 0.0) sgnPhi = tmpSgnPhi / std::fabs(tmpSgnPhi);
 
-      return std::atan2(sinPhi, cosPhi); 
+      double dot12_boosted = n1_boosted_norm.dot(n2_boosted_norm);
+      if (std::fabs(dot12_boosted) >= 1.0) dot12_boosted /= std::fabs(dot12_boosted);
+
+      return sgnPhi * std::acos(-dot12_boosted);
+
     }
 
     double deltaphi_jj(const FourMomentum& h1, const FourMomentum& h2) {
@@ -427,11 +493,15 @@ namespace Rivet {
     Histo1DPtr _h_sigma;
     Histo1DPtr _h_ZZ_incl;
     Histo1DPtr _h_ZZ_pth;
+    Histo1DPtr _h_ZZ_mz1;
     Histo1DPtr _h_ZZ_mz2;
-    Histo1DPtr _h_ZZ_mz2_incl;
+    Histo1DPtr _h_ZZ_mz2_accTest;
     Histo1DPtr _h_ZZ_dphi_jj;
     Histo1DPtr _h_ZZ_deta_jj;
     Histo1DPtr _h_ZZ_phi;
+    Histo1DPtr _h_ZZ_phi_2e2mu;
+    Histo1DPtr _h_ZZ_phi_4e;
+    Histo1DPtr _h_ZZ_phi_4mu;
     Histo1DPtr _h_ZZ_y4l_pT4l;
     Histo1DPtr _h_ZZ_mz1_mz2;
     // H > 4l BR
